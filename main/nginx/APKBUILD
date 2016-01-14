@@ -1,0 +1,108 @@
+# Maintainer: Cameron Banta <cbanta@gmail.com>
+# Contributor: Jeff Bilyk <jbilyk@gmail.com>
+# Contributor: Bartłomiej Piotrowski <nospam@bpiotrowski.pl>
+
+pkgname=nginx
+pkgver=1.9.9
+_nginxrtmpver=1.1.7
+pkgrel=1
+pkgdesc="lightweight HTTP and reverse proxy server"
+url="http://www.nginx.org"
+arch="all"
+license="custom"
+pkgusers="nginx"
+pkggroups="nginx"
+install=""
+# the nginx-initscritps provides openrc script, logrotate and user creation
+depends="nginx-initscripts"
+makedepends="pcre-dev openssl-dev zlib-dev linux-headers"
+subpackages="$pkgname-doc $pkgname-vim:vim"
+source="http://nginx.org/download/$pkgname-$pkgver.tar.gz
+	nginx-rtmp-module-$_nginxrtmpver.tar.gz::https://github.com/arut/nginx-rtmp-module/archive/v$_nginxrtmpver.tar.gz
+	"
+
+_builddir="$srcdir"/$pkgname-$pkgver
+
+prepare() {
+	cd "$_builddir"
+	for i in $source; do
+		case $i in
+		*.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
+		esac
+	done
+}
+
+_rundir=/var/run/$pkgname
+_logdir=/var/log/$pkgname
+_homedir=/var/lib/$pkgname
+_tmpdir=$_homedir/tmp
+_datadir=/usr/share/$pkgname
+_confdir=/etc/$pkgname
+
+build() {
+	cd "$_builddir"
+	./configure \
+		--prefix=$_datadir \
+		--sbin-path=/usr/sbin/$pkgname \
+		--conf-path=$_confdir/$pkgname.conf \
+		--pid-path=$_rundir/$pkgname.pid \
+		--lock-path=$_rundir/$pkgname.lock \
+		--error-log-path=$_logdir/error.log \
+		--http-log-path=$_logdir/access.log \
+		--http-client-body-temp-path=$_tmpdir/client_body \
+		--http-proxy-temp-path=$_tmpdir/proxy \
+		--http-fastcgi-temp-path=$_tmpdir/fastcgi \
+		--http-uwsgi-temp-path=$_tmpdir/uwsgi \
+		--http-scgi-temp-path=$_tmpdir/scgi \
+		--user=nginx \
+		--group=nginx \
+		--with-ipv6 \
+		--with-file-aio \
+		--with-pcre-jit \
+		--with-http_dav_module \
+		--with-http_ssl_module \
+		--with-http_stub_status_module \
+		--with-http_gzip_static_module \
+		--with-http_v2_module \
+		--with-http_auth_request_module \
+		--with-mail \
+		--with-mail_ssl_module \
+		--add-module="$srcdir/nginx-rtmp-module-$_nginxrtmpver" \
+		|| return 1
+	make || return 1
+}
+
+package() {
+	cd "$_builddir"
+	make DESTDIR="$pkgdir" INSTALLDIRS=vendor install || return 1
+
+	install -m644 -D LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+	install -m644 -D man/$pkgname.8 "$pkgdir"/usr/share/man/man8/$pkgname.8
+
+	install -d -m0755 "$pkgdir"/$_confdir/conf.d || return 1
+	install -d -m0755 "$pkgdir"/$_confdir/default.d || return 1
+	install -d -m0755 "$pkgdir"/var/www/localhost/htdocs || return 1
+	install -d -m0700 "$pkgdir"/$_homedir || return 1
+	install -d -m0700 "$pkgdir"/$_tmpdir || return 1
+	install -d -m0700 "$pkgdir"/$_logdir || return 1
+}
+
+vim() {
+	local t
+
+	depends=""
+	pkgdesc="Vim syntax for Nginx"
+	arch="noarch"
+
+	for t in ftdetect syntax indent; do
+		install -Dm644 "$_builddir"/contrib/vim/$t/$pkgname.vim \
+			"$subpkgdir"/usr/share/vim/vimfiles/$t/$pkgname.vim
+	done
+}
+
+md5sums="50fdfa08e93ead7a111cba5a5f5735af  nginx-1.9.9.tar.gz
+8006de2560db3e55bb15d110220076ac  nginx-rtmp-module-1.1.7.tar.gz"
+sha256sums="de66bb2b11c82533aa5cb5ccc27cbce736ab87c9f2c761e5237cda0b00068d73  nginx-1.9.9.tar.gz
+7922b0e3d5f3d9c4b275e4908cfb8f5fb1bfb3ac2df77f4c262cda56df21aab3  nginx-rtmp-module-1.1.7.tar.gz"
+sha512sums="9b8a82cccb834a1647f0d0ea5e202d8bebae273ed9865c232dae228746e7c4334aa03616a7553494550dbbd99d41f790ba4d880b10381da50513c8659cb5e9b3  nginx-1.9.9.tar.gz
+9883462a04683f1e7af175da04b86d259ff6d677864667588fb073143f7130969eb2a5a5a48ddceda7a555b908580f179bdcacb7f0111413d51db5bfe43b396e  nginx-rtmp-module-1.1.7.tar.gz"
