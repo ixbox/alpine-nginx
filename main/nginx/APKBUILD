@@ -3,7 +3,7 @@
 # Contributor: Bartłomiej Piotrowski <nospam@bpiotrowski.pl>
 
 pkgname=nginx
-pkgver=1.9.9
+pkgver=1.9.10
 _nginxrtmpver=1.1.7
 pkgrel=1
 pkgdesc="lightweight HTTP and reverse proxy server"
@@ -17,9 +17,7 @@ install=""
 depends="nginx-initscripts"
 makedepends="pcre-dev openssl-dev zlib-dev linux-headers"
 subpackages="$pkgname-doc $pkgname-vim:vim"
-source="http://nginx.org/download/$pkgname-$pkgver.tar.gz
-	nginx-rtmp-module-$_nginxrtmpver.tar.gz::https://github.com/arut/nginx-rtmp-module/archive/v$_nginxrtmpver.tar.gz
-	"
+source="http://nginx.org/download/$pkgname-$pkgver.tar.gz"
 
 _builddir="$srcdir"/$pkgname-$pkgver
 
@@ -67,7 +65,6 @@ build() {
 		--with-http_auth_request_module \
 		--with-mail \
 		--with-mail_ssl_module \
-		--add-module="$srcdir/nginx-rtmp-module-$_nginxrtmpver" \
 		|| return 1
 	make || return 1
 }
@@ -100,9 +97,6 @@ vim() {
 	done
 }
 
-md5sums="50fdfa08e93ead7a111cba5a5f5735af  nginx-1.9.9.tar.gz
-8006de2560db3e55bb15d110220076ac  nginx-rtmp-module-1.1.7.tar.gz"
-sha256sums="de66bb2b11c82533aa5cb5ccc27cbce736ab87c9f2c761e5237cda0b00068d73  nginx-1.9.9.tar.gz
-7922b0e3d5f3d9c4b275e4908cfb8f5fb1bfb3ac2df77f4c262cda56df21aab3  nginx-rtmp-module-1.1.7.tar.gz"
-sha512sums="9b8a82cccb834a1647f0d0ea5e202d8bebae273ed9865c232dae228746e7c4334aa03616a7553494550dbbd99d41f790ba4d880b10381da50513c8659cb5e9b3  nginx-1.9.9.tar.gz
-9883462a04683f1e7af175da04b86d259ff6d677864667588fb073143f7130969eb2a5a5a48ddceda7a555b908580f179bdcacb7f0111413d51db5bfe43b396e  nginx-rtmp-module-1.1.7.tar.gz"
+md5sums="64cc970988356a5e0fc4fcd1ab84fe57  nginx-1.9.10.tar.gz"
+sha256sums="fb14d76844cab0a5a0880768be28965e74f9956790f618c454ef6098e26631d9  nginx-1.9.10.tar.gz"
+sha512sums="60a736afe98e46abeb572c938702b09b0098164584bf8b5c1978c2b83269b6c2b99a60b7c8c9482230c26eebaeeb684f3aa7db52af4d7a3c18434542730873e0  nginx-1.9.10.tar.gz"
