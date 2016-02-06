@@ -14,8 +14,8 @@ dependencies:
 
 test:
   override:
-    - [ -f packages/main/x86_64/nginx-1.9.10-r1.apk ]
-    - [ -f packages/main/x86_64/nginx-lua-1.9.10-r1.apk ]
+    - test -f packages/main/x86_64/nginx-1.9.10-r1.apk
+    - test -f packages/main/x86_64/nginx-lua-1.9.10-r1.apk
 
 general:
   artifacts:
