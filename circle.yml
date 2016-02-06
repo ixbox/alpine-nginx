@@ -1,0 +1,11 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  override:
+    - docker pull ixbox/alpine-package-builder
+
+test:
+  override:
+    - docker run --rm -v $(pwd)/packages:/home/build/packages -e REPOSITORY="https://github.com/ixbox/alpine-nginx.git" -e PACKAGES="main/nginx main/nginx-lua" ixbox/alpine-package-builder
