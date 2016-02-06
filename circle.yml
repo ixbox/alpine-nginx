@@ -1,6 +1,6 @@
 general:
   artifacts:
-
+    - packages
 
 machine:
   services:
@@ -17,6 +17,8 @@ test:
     - test -f packages/main/x86_64/nginx-1.9.10-r1.apk
     - test -f packages/main/x86_64/nginx-lua-1.9.10-r1.apk
 
-general:
-  artifacts:
-    - packages
+deployment:
+  production:
+    branch: master
+    commands:
+      - ./deploy.sh
